@@ -4,8 +4,8 @@ import { scale } from "react-native-size-matters"
 
 const onBoardingOne = (props:any) => (
   <Svg
-    width={scale(320)}
-    height={scale(346)}
+    width={scale(290)}
+    height={scale(290)}
     viewBox="0 0 320 346"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
