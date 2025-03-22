@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
-    "version": "1.0.0",
+    "name": "Zora",
+    "slug": "zora",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "zora",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lihongbin.myapp"
+      "bundleIdentifier": "com.lihongbin.zora"
     },
     "android": {
       "adaptiveIcon": {
@@ -43,7 +43,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "67a45e0a-9326-48ea-b5d1-540de46f6abe"
+        "projectId": "732c70ca-2f0c-459d-a0c5-048f561332b5"
       }
     }
   }

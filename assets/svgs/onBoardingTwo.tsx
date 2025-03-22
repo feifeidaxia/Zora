@@ -1,11 +1,11 @@
 import * as React from "react";
 import Svg, { Rect, Defs, Pattern, Use, Image } from "react-native-svg";
-import { scale } from "react-native-size-matters"
+import { scale } from "react-native-size-matters";
 
-const onBoardingTwo = (props:any) => (
+const onBoardingTwo = (props: any) => (
   <Svg
     width={scale(280)}
-    height={scale(290)}
+    height={scale(270)}
     viewBox="0 0 320 297"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

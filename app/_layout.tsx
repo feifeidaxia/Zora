@@ -11,7 +11,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
-import React = require("react");
+import * as React from "react";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -20,6 +20,8 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    RobotFont: require("../assets/fonts/RobotoCondensed-Bold.ttf"),
+    SegoeUi: require("../assets/fonts/SegoeUI.ttf"),
   });
 
   useEffect(() => {
@@ -37,6 +39,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="/(routes)/onboarding" />
+        <Stack.Screen name="/(routes)/home" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
