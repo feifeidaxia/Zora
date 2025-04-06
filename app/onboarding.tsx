@@ -51,7 +51,7 @@ export default function OnBoarding() {
     } else {
       // Navigate to the next screen
       await AsyncStorage.setItem("onboarding", "true");
-      router.push("/(routes)/home");
+      router.push("/home");
     }
   };
   return (

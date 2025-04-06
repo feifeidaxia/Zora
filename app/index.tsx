@@ -19,7 +19,5 @@ export default function Index() {
   if (loading) {
     return null;
   }
-  return (
-    <Redirect href={isOnboarding ? "/(routes)/onboarding" : "/(routes)/home"} />
-  );
+  return <Redirect href={isOnboarding ? "/onboarding" : "/home"} />;
 }
