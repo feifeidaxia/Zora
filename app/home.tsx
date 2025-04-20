@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -18,8 +19,12 @@ import axios from "axios";
 import LottieView from "lottie-react-native";
 import * as Speech from "expo-speech";
 import Regenerate from "../assets/svgs/regenerate";
+import SettingIcon from "../assets/svgs/setting";
 import Onload from "../assets/svgs/onload";
+import StopCircleIcon from "../assets/svgs/stop";
 import * as FileSystem from "expo-file-system";
+import Feather from "@expo/vector-icons/Feather";
+import VoiceSettingModal from "../components/SettingModel";
 
 const startSound = require("../assets/sounds/start.mp3");
 const endSound = require("../assets/sounds/end.mp3");
@@ -37,6 +42,12 @@ export default function HomeScreen() {
   const [voice, setVoice] = React.useState("nova"); // 可选 alloy/echo/fable/onyx/shimmer
   const [userTranscript, setUserTranscript] = React.useState("");
   const lottieRef = React.useRef<LottieView>(null);
+  const [chatHistory, setChatHistory] = React.useState([
+    { role: "system", content: "你是一个有帮助的语音助手。" },
+  ]);
+  const [isConversationActive, setIsConversationActive] = React.useState(true);
+  const ttsSoundRef = React.useRef<Audio.Sound | null>(null); // 用于中止播放
+  const [allowContinue, setAllowContinue] = React.useState(false);
 
   const playSoundAndVibrate = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
@@ -171,25 +182,34 @@ export default function HomeScreen() {
     }
   };
 
-  const sendToGpt = async (text: string) => {
+  const sendToGpt = async (text: string, appendToHistory = true) => {
     try {
+      const newMessage = { role: "user", content: text };
+      const updatedHistory = appendToHistory
+        ? [...chatHistory, newMessage]
+        : [...chatHistory];
+
       const response = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
           model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: text }],
+          messages: updatedHistory,
         },
         {
           headers: {
-            Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`, // Replace with your actual API key
+            Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
             "Content-Type": "application/json",
           },
         }
       );
-      console.log("GPT Response:", response.data.choices[0].message.content);
-      setText(response.data.choices[0].message.content);
-      setIsLoading(false);
-      return response.data.choices[0].message.content;
+
+      const gptMessage = response.data.choices[0].message;
+      if (appendToHistory) {
+        setChatHistory([...updatedHistory, gptMessage]);
+      }
+
+      setText(gptMessage.content);
+      return gptMessage.content;
     } catch (e) {
       console.error("Error sending to GPT:", e);
       Alert.alert("Error", "Failed to send to GPT.");
@@ -208,33 +228,52 @@ export default function HomeScreen() {
         body: JSON.stringify({
           model: "tts-1",
           input: text,
-          voice: voice, // "nova", "fable", etc.
+          voice,
         }),
       });
 
       if (!response.ok) throw new Error("TTS request failed");
 
       const arrayBuffer = await response.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const base64 = buffer.toString("base64");
-
+      const base64 = Buffer.from(arrayBuffer).toString("base64");
       const fileUri = FileSystem.documentDirectory + "tts-speech.mp3";
       await FileSystem.writeAsStringAsync(fileUri, base64, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
       const { sound } = await Audio.Sound.createAsync({ uri: fileUri });
+      ttsSoundRef.current = sound;
+
       await sound.playAsync();
       sound.setOnPlaybackStatusUpdate((status) => {
         if (!status.isPlaying && status.didJustFinish) {
           setAiSpeaking(false);
+          setAllowContinue(true); // 允许继续对话
           sound.unloadAsync();
+          ttsSoundRef.current = null;
         }
       });
     } catch (error) {
       console.error("TTS Error:", error);
       Alert.alert("Error", "Failed to speak via OpenAI TTS.");
       setAiSpeaking(false);
+    }
+  };
+
+  const resetConversation = () => {
+    setChatHistory([{ role: "system", content: "你是一个有帮助的语音助手。" }]);
+    setText("");
+    setAiResponse(null);
+    stopSpeaking();
+    setAllowContinue(false);
+  };
+
+  const stopSpeaking = async () => {
+    setAiSpeaking(false);
+    if (ttsSoundRef.current) {
+      await ttsSoundRef.current.stopAsync();
+      await ttsSoundRef.current.unloadAsync();
+      ttsSoundRef.current = null;
     }
   };
 
@@ -295,7 +334,7 @@ export default function HomeScreen() {
           <>
             {!isRecording ? (
               <>
-                {aiResponse ? (
+                {aiSpeaking ? (
                   <View>
                     <LottieView
                       ref={lottieRef}
@@ -306,8 +345,30 @@ export default function HomeScreen() {
                         width: scale(250),
                         height: scale(250),
                       }}
-                    ></LottieView>
+                    />
                   </View>
+                ) : allowContinue ? (
+                  <TouchableOpacity
+                    style={{
+                      width: scale(110),
+                      height: scale(110),
+                      borderRadius: scale(100),
+                      backgroundColor: "#fff",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                    }}
+                    onPress={() => {
+                      setAllowContinue(false);
+                      startRecording();
+                    }}
+                  >
+                    <FontAwesome
+                      name="microphone"
+                      size={scale(50)}
+                      color="#2b3356"
+                    />
+                  </TouchableOpacity>
                 ) : (
                   <TouchableOpacity
                     style={{
@@ -325,7 +386,7 @@ export default function HomeScreen() {
                       name="microphone"
                       size={scale(50)}
                       color="#2b3356"
-                    ></FontAwesome>
+                    />
                   </TouchableOpacity>
                 )}
               </>
@@ -341,7 +402,7 @@ export default function HomeScreen() {
                     height: scale(210),
                     borderRadius: scale(100),
                   }}
-                ></LottieView>
+                />
               </TouchableOpacity>
             )}
           </>
@@ -356,38 +417,53 @@ export default function HomeScreen() {
           bottom: verticalScale(110),
         }}
       >
-        <Text
+        <ScrollView
           style={{
-            fontSize: scale(14),
-            color: "#fff",
+            height: verticalScale(120),
             width: scale(269),
-            textAlign: "center",
-            lineHeight: 25,
           }}
+          contentContainerStyle={{
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          showsVerticalScrollIndicator={true}
         >
-          {isLoading
-            ? "..."
-            : text || "Press the microphone to start recording"}
-        </Text>
+          <Text
+            style={{
+              fontSize: scale(14),
+              color: "#fff",
+              textAlign: "center",
+              lineHeight: 25,
+            }}
+          >
+            {isLoading
+              ? "..."
+              : text || "Press the microphone to start recording"}
+          </Text>
+        </ScrollView>
       </View>
+
       {aiResponse && (
         <View
           style={{
             position: "absolute",
-            bottom: verticalScale(56),
+            bottom: verticalScale(58),
             left: 0,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
             width: scale(360),
-            paddingHorizontal: scale(35),
+            paddingHorizontal: scale(45),
           }}
         >
-          <TouchableOpacity onPress={() => sendToGpt(userTranscript)}>
-            <Regenerate />
+          <TouchableOpacity onPress={() => sendToGpt(userTranscript, true)}>
+            <Onload />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => text && speakText(text)}>
-            <Onload />
+            <Regenerate />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => resetConversation()}>
+            <StopCircleIcon size={scale(33)} color="white" strokeWidth={2.5} />
           </TouchableOpacity>
         </View>
       )}
@@ -397,22 +473,10 @@ export default function HomeScreen() {
           flexDirection: "row",
           position: "absolute",
           top: verticalScale(60),
+          right: scale(25),
         }}
       >
-        {["nova", "fable", "alloy", "shimmer"].map((v) => (
-          <TouchableOpacity
-            key={v}
-            style={{
-              marginHorizontal: 5,
-              backgroundColor: voice === v ? "#fff" : "#444",
-              padding: 10,
-              borderRadius: 10,
-            }}
-            onPress={() => setVoice(v)}
-          >
-            <Text style={{ color: voice === v ? "#000" : "#fff" }}>{v}</Text>
-          </TouchableOpacity>
-        ))}
+        <VoiceSettingModal voice={voice} setVoice={setVoice} />
       </View>
     </LinearGradient>
   );
