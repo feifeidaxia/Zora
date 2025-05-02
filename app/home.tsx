@@ -4,7 +4,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
 import { View, StatusBar, Image, Alert } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
-import * as Haptics from "expo-haptics";
 import { Audio } from "expo-av";
 import axios from "axios";
 import LottieView from "lottie-react-native";
@@ -14,6 +13,7 @@ import TextDisplay from "../components/TextDisplay";
 import RecordButton from "../components/RecordButton";
 import LoadingAnimation from "../components/LoadingAnimation";
 import ControlButtons from "../components/ControlButtons";
+import { playSoundAndVibrate } from "../utils/haptics";
 
 const startSound = require("../assets/sounds/start.mp3");
 const endSound = require("../assets/sounds/end.mp3");
@@ -32,15 +32,6 @@ export default function HomeScreen() {
   ]);
   const ttsSoundRef = React.useRef<Audio.Sound | null>(null); // 用于中止播放
   const [allowContinue, setAllowContinue] = React.useState(false);
-
-  const playSoundAndVibrate = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
-
-    const { sound } = await Audio.Sound.createAsync(
-      isRecording ? endSound : startSound
-    );
-    await sound.playAsync();
-  };
 
   const getMicrophonePermission = async () => {
     try {
@@ -63,7 +54,7 @@ export default function HomeScreen() {
     const permission = await getMicrophonePermission();
     console.log("Permission status:", permission);
     if (!permission) return;
-    playSoundAndVibrate();
+    playSoundAndVibrate(isRecording);
     try {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
@@ -108,7 +99,7 @@ export default function HomeScreen() {
 
       setIsRecording(false);
       setIsLoading(true);
-      playSoundAndVibrate();
+      playSoundAndVibrate(isRecording);
 
       await recording.stopAndUnloadAsync();
       await recording.getStatusAsync();
