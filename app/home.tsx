@@ -2,35 +2,21 @@ import { Buffer } from "buffer";
 global.Buffer = global.Buffer || Buffer;
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
-import {
-  View,
-  Text,
-  StatusBar,
-  Image,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-} from "react-native";
+import { View, StatusBar, Image, Alert } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import * as Haptics from "expo-haptics";
 import { Audio } from "expo-av";
 import axios from "axios";
 import LottieView from "lottie-react-native";
-import * as Speech from "expo-speech";
-import Regenerate from "../assets/svgs/regenerate";
-import SettingIcon from "../assets/svgs/setting";
-import Onload from "../assets/svgs/onload";
-import StopCircleIcon from "../assets/svgs/stop";
 import * as FileSystem from "expo-file-system";
-import Feather from "@expo/vector-icons/Feather";
 import VoiceSettingModal from "../components/SettingModel";
+import TextDisplay from "../components/TextDisplay";
+import RecordButton from "../components/RecordButton";
+import LoadingAnimation from "../components/LoadingAnimation";
+import ControlButtons from "../components/ControlButtons";
 
 const startSound = require("../assets/sounds/start.mp3");
 const endSound = require("../assets/sounds/end.mp3");
-const startRecorgAnimation = require("../assets/animations/startRecorg.json");
-const loadingAnimation = require("../assets/animations/loading.json");
-const playAnimation = require("../assets/animations/play.json");
 
 export default function HomeScreen() {
   const [isRecording, setIsRecording] = React.useState(false);
@@ -39,13 +25,11 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [text, setText] = React.useState("");
   const [aiSpeaking, setAiSpeaking] = React.useState(false);
-  const [voice, setVoice] = React.useState("nova"); // 可选 alloy/echo/fable/onyx/shimmer
-  const [userTranscript, setUserTranscript] = React.useState("");
+  const [voice, setVoice] = React.useState("nova");
   const lottieRef = React.useRef<LottieView>(null);
   const [chatHistory, setChatHistory] = React.useState([
     { role: "system", content: "你是一个有帮助的语音助手。" },
   ]);
-  const [isConversationActive, setIsConversationActive] = React.useState(true);
   const ttsSoundRef = React.useRef<Audio.Sound | null>(null); // 用于中止播放
   const [allowContinue, setAllowContinue] = React.useState(false);
 
@@ -138,7 +122,6 @@ export default function HomeScreen() {
 
       const transcript = await sendAudioToAi(uri);
       setText(transcript);
-      setUserTranscript(transcript);
       const gptResponse = await sendToGpt(transcript);
       setAiResponse(true);
       setAiSpeaking(true);
@@ -316,168 +299,33 @@ export default function HomeScreen() {
         }}
       ></Image>
 
+      <VoiceSettingModal voice={voice} setVoice={setVoice} />
+
       <View style={{ marginTop: verticalScale(-30) }}>
         {isLoading ? (
-          <TouchableOpacity>
-            <LottieView
-              source={loadingAnimation}
-              autoPlay
-              loop
-              speed={1.3}
-              style={{
-                width: scale(270),
-                height: scale(270),
-              }}
-            ></LottieView>
-          </TouchableOpacity>
+          <LoadingAnimation />
         ) : (
-          <>
-            {!isRecording ? (
-              <>
-                {aiSpeaking ? (
-                  <View>
-                    <LottieView
-                      ref={lottieRef}
-                      source={playAnimation}
-                      autoPlay={false}
-                      loop={false}
-                      style={{
-                        width: scale(250),
-                        height: scale(250),
-                      }}
-                    />
-                  </View>
-                ) : allowContinue ? (
-                  <TouchableOpacity
-                    style={{
-                      width: scale(110),
-                      height: scale(110),
-                      borderRadius: scale(100),
-                      backgroundColor: "#fff",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexDirection: "row",
-                    }}
-                    onPress={() => {
-                      setAllowContinue(false);
-                      startRecording();
-                    }}
-                  >
-                    <FontAwesome
-                      name="microphone"
-                      size={scale(50)}
-                      color="#2b3356"
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={{
-                      width: scale(110),
-                      height: scale(110),
-                      borderRadius: scale(100),
-                      backgroundColor: "#fff",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexDirection: "row",
-                    }}
-                    onPress={startRecording}
-                  >
-                    <FontAwesome
-                      name="microphone"
-                      size={scale(50)}
-                      color="#2b3356"
-                    />
-                  </TouchableOpacity>
-                )}
-              </>
-            ) : (
-              <TouchableOpacity onPress={stopRecording}>
-                <LottieView
-                  source={startRecorgAnimation}
-                  autoPlay
-                  loop
-                  speed={0.8}
-                  style={{
-                    width: scale(210),
-                    height: scale(210),
-                    borderRadius: scale(100),
-                  }}
-                />
-              </TouchableOpacity>
-            )}
-          </>
+          <RecordButton
+            isRecording={isRecording}
+            aiSpeaking={aiSpeaking}
+            allowContinue={allowContinue}
+            startRecording={startRecording}
+            stopRecording={stopRecording}
+            lottieRef={lottieRef}
+            setAllowContinue={setAllowContinue}
+          />
         )}
       </View>
 
-      <View
-        style={{
-          position: "absolute",
-          alignItems: "center",
-          width: scale(350),
-          bottom: verticalScale(110),
-        }}
-      >
-        <ScrollView
-          style={{
-            height: verticalScale(120),
-            width: scale(269),
-          }}
-          contentContainerStyle={{
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          showsVerticalScrollIndicator={true}
-        >
-          <Text
-            style={{
-              fontSize: scale(14),
-              color: "#fff",
-              textAlign: "center",
-              lineHeight: 25,
-            }}
-          >
-            {isLoading
-              ? "..."
-              : text || "Press the microphone to start recording"}
-          </Text>
-        </ScrollView>
-      </View>
+      <TextDisplay isLoading={isLoading} text={text} />
 
-      {aiResponse && (
-        <View
-          style={{
-            position: "absolute",
-            bottom: verticalScale(58),
-            left: 0,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: scale(360),
-            paddingHorizontal: scale(45),
-          }}
-        >
-          <TouchableOpacity onPress={() => sendToGpt(userTranscript, true)}>
-            <Onload />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => text && speakText(text)}>
-            <Regenerate />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => resetConversation()}>
-            <StopCircleIcon size={scale(33)} color="white" strokeWidth={2.5} />
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <View
-        style={{
-          flexDirection: "row",
-          position: "absolute",
-          top: verticalScale(60),
-          right: scale(25),
-        }}
-      >
-        <VoiceSettingModal voice={voice} setVoice={setVoice} />
-      </View>
+      <ControlButtons
+        aiResponse={!!aiResponse}
+        text={text}
+        resetConversation={resetConversation}
+        speakText={speakText}
+        sendToGpt={() => sendToGpt("")}
+      />
     </LinearGradient>
   );
 }
