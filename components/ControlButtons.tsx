@@ -11,7 +11,7 @@ interface ControlButtonsProps {
   text: string | null;
   resetConversation: () => void;
   speakText: (text: string) => void;
-  sendToGpt: () => void;
+  handleSendToGpt: () => void;
 }
 
 const ControlButtons: React.FC<ControlButtonsProps> = ({
@@ -19,7 +19,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   text,
   resetConversation,
   speakText,
-  sendToGpt,
+  handleSendToGpt,
 }) => {
   return (
     aiResponse && (
@@ -35,7 +35,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           paddingHorizontal: scale(45),
         }}
       >
-        <TouchableOpacity onPress={() => sendToGpt()}>
+        <TouchableOpacity onPress={() => handleSendToGpt()}>
           <Onload />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => text && speakText(text)}>

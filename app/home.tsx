@@ -14,9 +14,7 @@ import RecordButton from "../components/RecordButton";
 import LoadingAnimation from "../components/LoadingAnimation";
 import ControlButtons from "../components/ControlButtons";
 import { playSoundAndVibrate } from "../utils/haptics";
-
-const startSound = require("../assets/sounds/start.mp3");
-const endSound = require("../assets/sounds/end.mp3");
+import { sendAudioToWhisper, sendToGpt, fetchTTS } from "../api/voice";
 
 export default function HomeScreen() {
   const [isRecording, setIsRecording] = React.useState(false);
@@ -111,9 +109,9 @@ export default function HomeScreen() {
         throw new Error("Recording URI not available");
       }
 
-      const transcript = await sendAudioToAi(uri);
+      const transcript = await sendAudioToWhisper(uri);
       setText(transcript);
-      const gptResponse = await sendToGpt(transcript);
+      const gptResponse = await handleSendToGpt(transcript);
       setAiResponse(true);
       setAiSpeaking(true);
       await speakText(gptResponse);
@@ -127,63 +125,66 @@ export default function HomeScreen() {
     }
   };
 
-  const sendAudioToAi = async (uri: string) => {
-    try {
-      const formData: any = new FormData();
-      formData.append("file", {
-        uri,
-        name: "recording.wav",
-        type: "audio/wav",
-      });
-      formData.append("model", "whisper-1"); // Assuming the model is required
-      const response = await axios.post(
-        "https://api.openai.com/v1/audio/transcriptions",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`, // Replace with your actual API key
-          },
-        }
-      );
-      console.log("AI Response:", response.data.text);
-      return response.data.text;
-    } catch (error) {
-      console.error("Error sending audio to AI:", error);
-      Alert.alert("Error", "Failed to send audio to AI.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const sendAudioToAi = async (uri: string) => {
+  //   try {
+  //     const formData: any = new FormData();
+  //     formData.append("file", {
+  //       uri,
+  //       name: "recording.wav",
+  //       type: "audio/wav",
+  //     });
+  //     formData.append("model", "whisper-1"); // Assuming the model is required
+  //     const response = await axios.post(
+  //       "https://api.openai.com/v1/audio/transcriptions",
+  //       formData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //           Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`, // Replace with your actual API key
+  //         },
+  //       }
+  //     );
+  //     console.log("AI Response:", response.data.text);
+  //     return response.data.text;
+  //   } catch (error) {
+  //     console.error("Error sending audio to AI:", error);
+  //     Alert.alert("Error", "Failed to send audio to AI.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  const sendToGpt = async (text: string, appendToHistory = true) => {
+  const handleSendToGpt = async (text: string, appendToHistory = true) => {
     try {
       const newMessage = { role: "user", content: text };
       const updatedHistory = appendToHistory
         ? [...chatHistory, newMessage]
         : [...chatHistory];
 
-      const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          model: "gpt-3.5-turbo",
-          messages: updatedHistory,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const gptMessage = response.data.choices[0].message;
+      // const response = await axios.post(
+      //   "https://api.openai.com/v1/chat/completions",
+      //   {
+      //     model: "gpt-3.5-turbo",
+      //     messages: updatedHistory,
+      //   },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
+      const response = await sendToGpt(updatedHistory);
+      console.log("🚀 ~ handleSendToGpt ~ response:", response);
       if (appendToHistory) {
-        setChatHistory([...updatedHistory, gptMessage]);
+        setChatHistory([
+          ...updatedHistory,
+          { role: "assistant", content: response },
+        ]);
       }
 
-      setText(gptMessage.content);
-      return gptMessage.content;
+      setText(response);
+      return response;
     } catch (e) {
       console.error("Error sending to GPT:", e);
       Alert.alert("Error", "Failed to send to GPT.");
@@ -193,28 +194,28 @@ export default function HomeScreen() {
   const speakText = async (text: string) => {
     setAiSpeaking(true);
     try {
-      const response = await fetch("https://api.openai.com/v1/audio/speech", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "tts-1",
-          input: text,
-          voice,
-        }),
-      });
+      // const response = await fetch("https://api.openai.com/v1/audio/speech", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
+      //   },
+      //   body: JSON.stringify({
+      //     model: "tts-1",
+      //     input: text,
+      //     voice,
+      //   }),
+      // });
 
-      if (!response.ok) throw new Error("TTS request failed");
+      // if (!response.ok) throw new Error("TTS request failed");
 
-      const arrayBuffer = await response.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString("base64");
-      const fileUri = FileSystem.documentDirectory + "tts-speech.mp3";
-      await FileSystem.writeAsStringAsync(fileUri, base64, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
+      // const arrayBuffer = await response.arrayBuffer();
+      // const base64 = Buffer.from(arrayBuffer).toString("base64");
+      // const fileUri = FileSystem.documentDirectory + "tts-speech.mp3";
+      // await FileSystem.writeAsStringAsync(fileUri, base64, {
+      //   encoding: FileSystem.EncodingType.Base64,
+      // });
+      const fileUri = await fetchTTS(text, voice);
       const { sound } = await Audio.Sound.createAsync({ uri: fileUri });
       ttsSoundRef.current = sound;
 
@@ -315,7 +316,7 @@ export default function HomeScreen() {
         text={text}
         resetConversation={resetConversation}
         speakText={speakText}
-        sendToGpt={() => sendToGpt("")}
+        handleSendToGpt={() => handleSendToGpt("")}
       />
     </LinearGradient>
   );
