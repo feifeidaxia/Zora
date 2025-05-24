@@ -9,7 +9,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "eas-build-pre-install": "corepack enable && corepack prepare pnpm@9.2.0 --activate"
   },
   "jest": {
     "preset": "jest-expo"
@@ -23,6 +24,7 @@
     "axios": "^1.8.4",
     "buffer": "^6.0.3",
     "expo": "~52.0.32",
+    "expo-asset": "^11.1.5",
     "expo-av": "^15.0.2",
     "expo-blur": "~14.0.3",
     "expo-constants": "~17.0.5",
