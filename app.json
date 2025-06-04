@@ -39,12 +39,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash1.png",
-          "imageWidth": 200,
+          "image": "./assets/images/splash1.jpg",
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true
