@@ -9,12 +9,11 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
-import { Image } from "react-native";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as React from "react";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// 阻止自动隐藏 splash screen
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -30,18 +29,7 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepare() {
       try {
-        // 随机选择启动图片
-        const splashImages = [
-          require("../assets/images/splash1.png"),
-          require("../assets/images/splash2.png"),
-        ];
-        const randomIndex = Math.floor(Math.random() * splashImages.length);
-        const selectedSplash = splashImages[randomIndex];
-
-        // 预加载选中的启动图片
-        await Image.prefetch(selectedSplash);
-
-        // 模拟一些加载时间，确保启动封面显示足够长
+        // 模拟加载延迟
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } catch (e) {
         console.warn(e);
