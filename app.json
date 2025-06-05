@@ -20,7 +20,7 @@
       "package": "com.lihongbin.zora.dev",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0a0f2c"
       },
       "permissions": [
         "RECORD_AUDIO",
@@ -39,9 +39,9 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash1.jpg",
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "image": "./assets/images/splash.jpg",
+          "resizeMode": "cover",
+          "backgroundColor": "#0a0f2c"
         }
       ],
       "expo-asset"
