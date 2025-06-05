@@ -11,6 +11,7 @@ import {
 import { scale, verticalScale } from "react-native-size-matters";
 import { LinearGradient } from "expo-linear-gradient";
 import SettingIcon from "../assets/svgs/setting";
+import { ScrollView } from "react-native";
 
 interface VoiceSettingModalProps {
   voice: string;
@@ -41,7 +42,17 @@ const VoiceSettingModal: React.FC<VoiceSettingModalProps> = ({
     }).start(() => setShowModal(false));
   };
 
-  const voices = ["nova", "fable", "alloy", "shimmer"];
+  const voices = [
+    "nova",
+    "fable",
+    "alloy",
+    "ash",
+    "coral",
+    "echo",
+    "onyx",
+    "sage",
+    "shimmer",
+  ];
 
   return (
     <View
@@ -71,37 +82,39 @@ const VoiceSettingModal: React.FC<VoiceSettingModalProps> = ({
               <Animated.View
                 style={[styles.modalContent, { opacity: fadeAnim }]}
               >
-                {voices.map((v) =>
-                  voice === v ? (
-                    <LinearGradient
-                      key={v}
-                      colors={["#00ffff", "#ff00ff"]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={styles.optionActive}
-                    >
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  {voices.map((v) =>
+                    voice === v ? (
+                      <LinearGradient
+                        key={v}
+                        colors={["#00ffff", "#ff00ff"]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.optionActive}
+                      >
+                        <TouchableOpacity
+                          onPress={() => {
+                            setVoice(v);
+                            closeModal();
+                          }}
+                        >
+                          <Text style={styles.optionTextActive}>{v}</Text>
+                        </TouchableOpacity>
+                      </LinearGradient>
+                    ) : (
                       <TouchableOpacity
+                        key={v}
                         onPress={() => {
                           setVoice(v);
                           closeModal();
                         }}
+                        style={styles.option}
                       >
-                        <Text style={styles.optionTextActive}>{v}</Text>
+                        <Text style={styles.optionText}>{v}</Text>
                       </TouchableOpacity>
-                    </LinearGradient>
-                  ) : (
-                    <TouchableOpacity
-                      key={v}
-                      onPress={() => {
-                        setVoice(v);
-                        closeModal();
-                      }}
-                      style={styles.option}
-                    >
-                      <Text style={styles.optionText}>{v}</Text>
-                    </TouchableOpacity>
-                  )
-                )}
+                    )
+                  )}
+                </ScrollView>
               </Animated.View>
             </TouchableWithoutFeedback>
           </LinearGradient>
@@ -122,6 +135,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 12,
     width: "80%",
+    height: scale(260),
     borderWidth: 1,
     borderColor: "#44f",
     shadowColor: "#0ff",

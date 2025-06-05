@@ -7,17 +7,20 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
-import "react-native-reanimated";
-
+import { useEffect, useState } from "react";
+import { ImageBackground, StyleSheet, View } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as React from "react";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// 本地封面图（1080x1920）
+const SplashImage = require("../assets/images/splash.jpg");
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const [isReady, setIsReady] = useState(false);
+
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     RobotFont: require("../assets/fonts/RobotoCondensed-Bold.ttf"),
@@ -25,18 +28,41 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    async function prepare() {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // 模拟加载
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setIsReady(true);
+      }
     }
-  }, [loaded]);
 
-  if (!loaded) {
-    return null;
+    prepare();
+  }, []);
+
+  useEffect(() => {
+    if (loaded && isReady) {
+      SplashScreen.hideAsync(); // 隐藏系统 splash
+    }
+  }, [loaded, isReady]);
+
+  if (!loaded || !isReady) {
+    // ✅ 自定义 splash 显示（全屏背景图）
+    return (
+      <View style={styles.container}>
+        <ImageBackground
+          source={SplashImage}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      </View>
+    );
   }
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="home" />
@@ -45,3 +71,15 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#0a0f2c",
+  },
+  image: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+});
