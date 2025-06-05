@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Zora Dev",
-    "slug": "zora-dev",
+    "name": "Zora",
+    "slug": "zora",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,22 +10,18 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lihongbin.zora.dev",
+      "bundleIdentifier": "com.lihongbin.zora",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio.",
-        "ITSAppUsesNonExemptEncryption": false
+        "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio."
       }
     },
     "android": {
-      "package": "com.lihongbin.zora.dev",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#0a0f2c"
+        "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "RECORD_AUDIO",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
+        "RECORD_AUDIO"
       ]
     },
     "web": {
@@ -39,12 +35,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash.jpg",
-          "resizeMode": "cover",
-          "backgroundColor": "#0a0f2c"
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
         }
-      ],
-      "expo-asset"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -54,9 +50,8 @@
         "origin": false
       },
       "eas": {
-        "projectId": "f5f33fc0-f7ef-4020-984d-01858e89cfcb"
+        "projectId": "732c70ca-2f0c-459d-a0c5-048f561332b5"
       }
-    },
-    "owner": "lihongbin"
+    }
   }
 }
