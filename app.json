@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.lihongbin.zora",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio."
+        "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -21,7 +22,9 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "RECORD_AUDIO"
+        "RECORD_AUDIO",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
     "web": {
@@ -31,16 +34,16 @@
     },
     "plugins": [
       "expo-router",
-      "expo-av",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
+      "expo-av"
+      // [
+      //   "expo-splash-screen",
+      //   {
+      //     "image": "./assets/images/splash-icon.png",
+      //     "imageWidth": 200,
+      //     "resizeMode": "contain",
+      //     "backgroundColor": "#ffffff"
+      //   }
+      // ]
     ],
     "experiments": {
       "typedRoutes": true
