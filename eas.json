@@ -15,10 +15,7 @@
       }
     },
     "preview": {
-      "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://go-voice-api.onrender.com/api"
-      }
+      "distribution": "internal"
     },
     "production": {
       "autoIncrement": true,
