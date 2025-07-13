@@ -1,4 +1,4 @@
-package com.lihongbin.zora.dev
+package com.lihongbin.zora
 
 import android.app.Application
 import android.content.res.Configuration

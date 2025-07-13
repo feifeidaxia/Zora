@@ -1,4 +1,4 @@
-package com.lihongbin.zora.dev
+package com.lihongbin.zora
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

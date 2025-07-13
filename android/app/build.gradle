@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.lihongbin.zora.dev'
+    namespace 'com.lihongbin.zora'
     defaultConfig {
-        applicationId 'com.lihongbin.zora.dev'
+        applicationId 'com.lihongbin.zora'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

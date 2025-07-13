@@ -13,7 +13,15 @@
       "bundleIdentifier": "com.lihongbin.zora",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSExceptionDomains": {
+            "16.176.169.86": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSIncludesSubdomains": true
+            }
+          }
+        }
       }
     },
     "android": {
@@ -27,7 +35,8 @@
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE"
-      ]
+      ],
+      "package": "com.lihongbin.zora"
     },
     "web": {
       "bundler": "metro",
