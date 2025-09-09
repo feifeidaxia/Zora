@@ -22,8 +22,8 @@
 ### 安装步骤
 1. 克隆仓库
 ```bash
-git clone https://github.com/yourusername/deepseekchat.git
-cd deepseekchat
+git clone https://github.com/feifeidaxia/Zora.git
+cd project
 ```
 
 2. 安装依赖
