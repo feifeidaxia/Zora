@@ -12,24 +12,15 @@
       },
       "ios": {
         "simulator": false
-      },
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.4:8080/api"
       }
     },
     "preview": {
-      "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "http://16.176.169.86/api"
-      }
+      "distribution": "internal"
     },
     "production": {
       "autoIncrement": true,
       "android": {
         "buildType": "apk"
-      },
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "http://16.176.169.86/api"
       }
     }
   },
