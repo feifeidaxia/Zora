@@ -1,50 +1,82 @@
-# Welcome to your Expo app 👋
+# OpenAI 语音助手
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+![项目截图](assets/images/screenshot.png)
 
-## Get started
+一个基于React Native和Expo的智能语音助手应用，支持语音输入、GPT对话和TTS语音输出。
 
-1. Install dependencies
+## 功能特性
 
-   ```bash
-   npm install
-   ```
+- 🎙️ 语音识别输入
+- 🤖 GPT智能对话
+- 🔊 TTS语音输出
+- 🎨 现代化UI界面
+- 📱 跨平台支持(iOS/Android)
 
-2. Start the app
+## 快速开始
 
-   ```bash
-    npx expo start
-   ```
+### 环境要求
+- Node.js 18+
+- Expo CLI
+- Yarn或npm
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+### 安装步骤
+1. 克隆仓库
 ```bash
-npm run reset-project
+git clone https://github.com/yourusername/deepseekchat.git
+cd deepseekchat
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. 安装依赖
+```bash
+yarn install
+# 或
+npm install
+```
 
-## Learn more
+3. 配置环境变量  
+复制`.env.example`为`.env`并填写您的API密钥：
+```env
+EXPO_PUBLIC_API_BASE_URL=your_api_url_here
+EXPO_PUBLIC_OPENAI_API_KEY=your_openai_key_here
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+4. 启动开发服务器
+```bash
+expo start
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## 开发指南
 
-## Join the community
+### 项目结构
+```
+├── app/               # 主应用入口
+├── api/               # API相关代码
+├── assets/            # 静态资源
+├── components/        # 可复用组件
+├── configs/           # 配置文件
+└── utils/             # 工具函数
+```
 
-Join our community of developers creating universal apps.
+### 代码规范
+- 使用TypeScript
+- 遵循React Hooks最佳实践
+- 组件使用PascalCase命名
+- 常量使用UPPER_CASE命名
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 安全注意事项
+
+⚠️ **重要**：本项目已移除所有硬编码的敏感信息，但请确保：
+1. 不要提交`.env`文件到版本控制
+2. 使用环境变量管理所有API密钥
+3. 定期轮换生产环境密钥
+
+## 贡献指南
+
+欢迎提交Pull Request！请确保：
+1. 代码通过ESLint检查
+2. 添加适当的单元测试
+3. 更新相关文档
+
+## 许可证
+
+MIT License
